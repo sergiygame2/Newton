@@ -22,11 +22,10 @@ namespace CreateEntities
 
             var objectsParser = new Parser();
 
-            var clubsParser = new FindClub(FootballClub.CreateClub);
-            var personParser = new FindPerson(Person.CreatePerson);
-            var companyParser = new FindCompany(Company.CreateCompany);
-
-            Dictionary<string, System.Delegate> delDictionary = new Dictionary<string, System.Delegate>
+            Func<Match, Person> personParser = Person.CreatePerson;
+            Func<Match, FootballClub> clubsParser = FootballClub.CreateClub;
+            Func<Match, Company> companyParser = Company.CreateCompany;
+            Dictionary<string, Func<Match,MyEntity>> delDictionary = new Dictionary<string, Func<Match, MyEntity>>
             {
                 [personReg] = personParser,
                 [clubReg] = clubsParser,
@@ -70,9 +69,6 @@ namespace CreateEntities
             Console.ReadLine();
         }
     }
-    delegate Person FindPerson(Match match);
-    delegate FootballClub FindClub(Match match);
-    delegate Company FindCompany(Match match);
 
     class MyEntity 
     {
@@ -92,10 +88,10 @@ namespace CreateEntities
     class Parser
     {
         public Parser() { }
-        public List<MyEntity> Parse(string text, Dictionary<string, Delegate> delDictionary)
+        public List<MyEntity> Parse(string text, Dictionary<string, Func<Match, MyEntity>> delDictionary)
         {
             var objectsList = new List<MyEntity>();
-            foreach (KeyValuePair<string, Delegate> entry in delDictionary)
+            foreach (KeyValuePair<string, Func<Match, MyEntity>> entry in delDictionary)
             {
                 var objectsMatches = Regex.Matches(text, entry.Key);
                 for (int i = 0; i < objectsMatches.Count; i++)
